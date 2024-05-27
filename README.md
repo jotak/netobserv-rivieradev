@@ -59,7 +59,7 @@ USER=netobserv make deploy-kind
 make deploy-prometheus deploy-grafana deploy-loki
 
 # Configurer NetObserv (resource FlowCollector)
-kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/flowcollector.yaml
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/flowcollector-kind.yaml
 ```
 
 Console Prometheus: http://localhost:9090/
@@ -71,8 +71,29 @@ Pour éditer la config:
 kubectl edit flowcollector cluster
 ```
 
-
 ### Autre
+
+Si vous avez OperatorHub, utilisez-le pour installer l'opérateur.
+
+Vous pouvez aussi utiliser [operator-sdk](https://sdk.operatorframework.io/docs/installation/) puis lancer:
+
+```bash
+operator-sdk run bundle quay.io/netobserv/network-observability-operator-bundle:v1.6.0 --timeout 5m
+```
+
+Autrement, clonez le repo operator et utilisez la Makefile:
+
+```bash
+git clone git@github.com:netobserv/network-observability-operator.git
+cd network-observability-operator
+USER=netobserv make deploy
+
+# Si besoin, pour installer Grafana / Prometheus / Loki:
+make deploy-prometheus deploy-grafana deploy-loki
+
+# Configurer NetObserv (resource FlowCollector)
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/flowcollector-kind.yaml
+```
 
 ## Déployer des workloads
 
