@@ -24,14 +24,9 @@ spec:
     #     name: ""
   loki:
     enable: true
-    # Change mode to "LokiStack" to use with the loki operator
     mode: Monolithic
     monolithic:
       url: 'http://loki.netobserv.svc:3100/'
-    lokiStack:
-      name: loki
-      # Change loki operator instance namespace
-      # namespace: loki-operator
   consolePlugin:
     enable: true
   exporters: []
