@@ -1,0 +1,47 @@
+apiVersion: flows.netobserv.io/v1beta2
+kind: FlowCollector
+metadata:
+  name: cluster
+spec:
+  namespace: netobserv
+  deploymentModel: Direct
+  agent:
+    type: eBPF
+    ebpf:
+      sampling: 50
+      # Change privileged to "true" on old kernel version not knowing CAP_BPF or when using "PacketDrop" feature
+      privileged: true
+      # features:
+      # - "PacketDrop"
+      # - "DNSTracking"
+      # - "FlowRTT"
+  # processor:
+    # addZone: true
+    # subnetLabels:
+    #   openShiftAutoDetect: true
+    #   customLabels:
+    #   - cidrs: []
+    #     name: ""
+  loki:
+    enable: true
+    # Change mode to "LokiStack" to use with the loki operator
+    mode: Monolithic
+    monolithic:
+      url: 'http://loki.netobserv.svc:3100/'
+    lokiStack:
+      name: loki
+      # Change loki operator instance namespace
+      # namespace: loki-operator
+  consolePlugin:
+    enable: true
+  exporters: []
+    # - type: Kafka
+    #   kafka:
+    #     address: "kafka-cluster-kafka-bootstrap.netobserv"
+    #     topic: netobserv-flows-export
+    # or
+    # - type: IPFIX
+    #   ipfix:
+    #     targetHost: "ipfix-collector.ipfix.svc.cluster.local"
+    #     targetPort: 4739
+    #     transport: TCP or UDP (optional - defaults to TCP)
