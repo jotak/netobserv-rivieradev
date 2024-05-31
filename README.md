@@ -118,6 +118,7 @@ Console Grafana: http://localhost:3000/
 - Log avec admin/admin
 - Cliquer sur "skip" pour passer la définition d'un autre mot de passe
 - Voir les flow logs par exemple dans le menu "Explore"
+- On pourra également importer la dashboard: [Network Observability.json](./deploy/dashboard/Network%20Observability.json)
 
 Pour éditer la config de NetObserv:
 
