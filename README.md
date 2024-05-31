@@ -48,9 +48,8 @@ kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/ma
 git clone git@github.com:netobserv/network-observability-operator.git
 cd network-observability-operator
 
-# Démarrer KIND
+# Démarrer KIND (pour podman, il faut lancer en root, cf plus bas)
 kind create cluster
-# (avec sudo pour podman; dans ce cas, récupérer le /root/.kube/config créé + changer chown pour utiliser kubectl)
 
 # Déployer netobserv
 USER=netobserv make deploy-kind
