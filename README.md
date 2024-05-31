@@ -2,6 +2,19 @@
 
 Ce repo contient les instructions et resources utiles au déroulement du [Deep Dive NetObserv](https://www.rivieradev.fr/session/226).
 
+## Diagramme NetObserv
+
+https://docs.openshift.com/container-platform/4.15/observability/network_observability/understanding-network-observability-operator.html
+
+### Without Kafka
+
+![Without Kafka](./images/diag-no-kafka.png)
+
+### With Kafka
+
+![Without Kafka](./images/diag-kafka.png)
+
+
 ## Installation
 
 ### OpenShift / OperatorHub
@@ -50,15 +63,19 @@ cd network-observability-operator
 
 # Démarrer KIND (pour podman, il faut lancer en root, cf plus bas)
 kind create cluster
+kubectl config set-context --current --namespace=netobserv
 
 # Déployer netobserv
 USER=netobserv make deploy-kind
 
-# Déployer Prometheus, Grafana et Loki
-make deploy-prometheus deploy-grafana deploy-loki
+# Déployer Grafana et Loki
+make deploy-grafana deploy-loki
 
 # Configurer NetObserv (resource FlowCollector)
 kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/flowcollector-kind.yaml
+
+# Déployer Prometheus
+make deploy-prometheus
 ```
 
 Console Prometheus: http://localhost:9090/
