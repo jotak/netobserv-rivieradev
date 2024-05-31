@@ -200,3 +200,8 @@ Activer les packet drops, latency, DNS, AZ ...
 - GitHub principal: https://github.com/netobserv/network-observability-operator
 - OperatorHub: https://operatorhub.io/operator/netobserv-operator
 - Compte masto: https://hachyderm.io/@netobserv
+
+### Docs spécifiques
+
+- Métriques: https://github.com/netobserv/network-observability-operator/blob/main/docs/Metrics.md
+- Flows format: https://github.com/netobserv/network-observability-operator/blob/main/docs/flows-format.adoc
