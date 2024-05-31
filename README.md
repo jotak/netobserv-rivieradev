@@ -53,8 +53,9 @@ kubectl apply -n netobserv -f https://raw.githubusercontent.com/jotak/netobserv-
 kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/flowcollector-loki-operator.yaml
 ```
 
+### KIND (quick setup)
 
-### KIND
+Téléchargez KIND: https://kind.sigs.k8s.io/
 
 ```bash
 # Cloner le repo
@@ -65,23 +66,60 @@ cd network-observability-operator
 kind create cluster
 kubectl config set-context --current --namespace=netobserv
 
-# Déployer netobserv
+# Déployer netobserv operator
 USER=netobserv make deploy-kind
 
 # Déployer Grafana et Loki
 make deploy-grafana deploy-loki
 
 # Configurer NetObserv (resource FlowCollector)
-kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/flowcollector-kind.yaml
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/netobserv/flowcollector-kind.yaml
 
 # Déployer Prometheus
 make deploy-prometheus
 ```
 
-Console Prometheus: http://localhost:9090/
-Console Grafana: http://localhost:3000/
+### KIND (détaillé)
 
-Pour éditer la config:
+Téléchargez KIND: https://kind.sigs.k8s.io/
+
+```bash
+# Démarrer KIND (pour podman, il faut lancer en root, cf plus bas)
+kind create cluster
+kubectl create namespace netobserv && kubectl config set-context --current --namespace=netobserv
+
+# Installer cert-manager
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.yaml
+
+# Installer Prometheus
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/prometheus.yaml && kubectl rollout status "deploy/prometheus" --timeout=600s
+kubectl port-forward --address 0.0.0.0 svc/prometheus 9090:9090 2>&1 >/dev/null &
+
+# Installer Loki
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/loki.yaml
+
+# Installer Grafana
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/grafana.yaml && kubectl rollout status "deploy/grafana" --timeout=600s
+kubectl port-forward --address 0.0.0.0 svc/grafana 3000:3000 2>&1 >/dev/null &
+
+# Installer NetObserv operator
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/netobserv/operator.yaml --server-side
+
+# Configurer NetObserv (resource FlowCollector)
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/netobserv/flowcollector-kind.yaml
+```
+
+### KIND: suite
+
+Console Prometheus: http://localhost:9090/
+- On peut exécuter du promQL tel que: `sum(rate(netobserv_workload_ingress_bytes_total[1m])) by (SrcK8S_Namespace, DstK8S_Namespace)`.
+
+Console Grafana: http://localhost:3000/
+- Log avec admin/admin
+- Cliquer sur "skip" pour passer la définition d'un autre mot de passe
+- Voir les flow logs par exemple dans le menu "Explore"
+
+Pour éditer la config de NetObserv:
 
 ```bash
 kubectl edit flowcollector cluster
@@ -89,11 +127,13 @@ kubectl edit flowcollector cluster
 
 #### Créer le cluster KIND avec podman en root
 
+!! Pas secure du tout !! Les pods fonctionnent en root.
+
 ```bash
 sudo kind create cluster
 sudo mv /root/.kube/config /home/user/.kube/config-root
 sudo chown user:user /home/user/.kube/config-root
-export KUBECONFIG=/home/user/.kube/config-root
+export KUBECONFIG=/home/$USER/.kube/config-root
 ```
 
 ### Autre
@@ -114,10 +154,12 @@ cd network-observability-operator
 USER=netobserv make deploy
 
 # Si besoin, pour installer Grafana / Prometheus / Loki:
-make deploy-prometheus deploy-grafana deploy-loki
+make deploy-grafana deploy-loki
 
 # Configurer NetObserv (resource FlowCollector)
 kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/flowcollector-kind.yaml
+
+make deploy-prometheus
 ```
 
 ## Déployer des workloads
@@ -145,6 +187,11 @@ Activer les packet drops, latency, DNS, AZ ...
 - Customiser les métriques, créer des alertes
 - Filtrage eBPF, subnet flagging
 - CLI, packet capture
+
+## Sujets annexes que l'on peut aborder
+
+- eBPF, c'est quoi?
+- Prometheus et promQL: comment utiliser?
 
 ## Liens
 
