@@ -71,6 +71,15 @@ Pour éditer la config:
 kubectl edit flowcollector cluster
 ```
 
+#### Créer le cluster KIND avec podman en root
+
+```bash
+sudo kind create cluster
+sudo mv /root/.kube/config /home/user/.kube/config-root
+sudo chown user:user /home/user/.kube/config-root
+export KUBECONFIG=/home/user/.kube/config-root
+```
+
 ### Autre
 
 Si vous avez OperatorHub, utilisez-le pour installer l'opérateur.
