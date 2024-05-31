@@ -169,6 +169,7 @@ E.g. demo-mesh-arena:
 
 ```bash
 kubectl create namespace mesh-arena ; kubectl apply -f https://raw.githubusercontent.com/jotak/demo-mesh-arena/main/quickstart-naked.yml -n mesh-arena
+kubectl port-forward --address 0.0.0.0 svc/ui -n mesh-arena 8080:8080 2>&1 >/dev/null &
 ```
 
 DDoS e.g. [hey-ho](https://github.com/jotak/hey-ho):
