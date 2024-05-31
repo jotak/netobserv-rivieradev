@@ -25,14 +25,14 @@ Pour commencer, le plus simple sera de faire sans Loki:
 
 ```bash
 # Configurer NetObserv (resource FlowCollector)
-kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/flowcollector-no-loki.yaml
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/netobserv/flowcollector-no-loki.yaml
 ```
 
 Si vous utilisez l'opérateur community, vous devrez activer le "User workload monitoring" d'OpenShift, de façon à activer Prometheus pour tous les workloads:
 
 ```bash
 # Activer le "User workload monitoring" (c'est juste un flag dans une config map)
-kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/openshift-user-workload-monitoring.yaml
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/openshift-user-workload-monitoring.yaml
 ```
 
 #### Loki Operator
@@ -47,10 +47,10 @@ Une fois la doc suivie & le Secret créé dans le namespace netobserv, reste à 
 
 ```yaml
 # Configurer LokiStack (à adapter éventuellement: référence du secret, size, storageClassName...)
-kubectl apply -n netobserv -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/lokistack.yaml
+kubectl apply -n netobserv -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/lokistack.yaml
 
 # Configurer NetObserv (resource FlowCollector)
-kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/flowcollector-loki-operator.yaml
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/netobserv/flowcollector-loki-operator.yaml
 ```
 
 ### KIND (quick setup)
