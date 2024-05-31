@@ -1,0 +1,55 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: netobserv/netobserv-serving-cert
+  labels:
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/created-by: netobserv-operator
+    app.kubernetes.io/instance: validating-webhook-configuration
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: validatingwebhookconfiguration
+    app.kubernetes.io/part-of: netobserv-operator
+  name: netobserv-validating-webhook-configuration
+webhooks:
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: netobserv-webhook-service
+        namespace: netobserv
+        path: /validate-netobserv-io-v1beta2-flowcollector
+    failurePolicy: Fail
+    name: flowcollectorconversionwebhook.netobserv.io
+    rules:
+      - apiGroups:
+          - netobserv.io
+        apiVersions:
+          - v1beta2
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - flowcollectors
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: netobserv-webhook-service
+        namespace: netobserv
+        path: /validate-flows-netobserv-io-v1alpha1-flowmetric
+    failurePolicy: Fail
+    name: flowmetricvalidationwebhook.netobserv.io
+    rules:
+      - apiGroups:
+          - flows.netobserv.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - flowmetrics
+    sideEffects: None

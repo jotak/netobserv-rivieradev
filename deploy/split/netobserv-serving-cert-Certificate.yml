@@ -1,0 +1,21 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    app.kubernetes.io/component: certificate
+    app.kubernetes.io/created-by: netobserv-operator
+    app.kubernetes.io/instance: serving-cert
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: certificate
+    app.kubernetes.io/part-of: netobserv-operator
+  name: netobserv-serving-cert
+  namespace: netobserv
+spec:
+  dnsNames:
+    - netobserv-webhook-service.netobserv.svc
+    - netobserv-webhook-service.netobserv.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: netobserv-selfsigned-issuer
+  secretName: webhook-server-cert
