@@ -197,6 +197,7 @@ kubectl get pods -w # attendre que le pod netobserv-plugin redémarre
 kubectl port-forward --address 0.0.0.0 svc/netobserv-plugin 9001:9001 2>&1 >/dev/null &
 ```
 
+Ouvrir http://localhost:9001/
 
 ## Déployer des workloads
 
