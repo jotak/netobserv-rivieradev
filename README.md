@@ -173,6 +173,31 @@ kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/ma
 make deploy-prometheus
 ```
 
+### Console NetObserv sans OpenShift
+
+NB: il s'agit d'une version "standalone" du plugin console openshift, utilisée par l'équipe de développement dans le cadre de tests. Elle peut manquer de polishing ici ou là.
+
+```bash
+kubectl edit flowcollector cluster
+```
+
+Ajoutez ce yaml dans `consolePlugin`:
+
+```yaml
+    advanced:
+      env:
+        TEST_CONSOLE: "true"
+```
+
+```bash
+kubectl set env deployment/netobserv-controller-manager -c "manager" RELATED_IMAGE_CONSOLE_PLUGIN="quay.io/jotak/network-observability-standalone-frontend:riviera2024"
+
+kubectl get pods -w # attendre que le pod netobserv-plugin redémarre
+
+kubectl port-forward --address 0.0.0.0 svc/netobserv-plugin 9001:9001 2>&1 >/dev/null &
+```
+
+
 ## Déployer des workloads
 
 E.g. demo-mesh-arena:
