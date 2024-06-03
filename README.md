@@ -9,8 +9,8 @@ Ce repo contient les instructions et resources utiles au déroulement du [Deep D
 - [CNI](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/): plugins network pour K8S. Vous en avez forcément un (au moins) sur votre cluster. Il n'est pas garanti que NetObserv fonctionne avec n'importe lequel. Par exemple, Cilium bloque l'exécution des agents eBPF de netobserv.
 - [Loki](https://grafana.com/docs/loki/latest/): un log store développé par Grafana, concurrent d'Elastic. Peut s'adosser à du stockage objet/S3 (entre autres).
 - [Prometheus](https://prometheus.io/docs/introduction/overview/): un metric store, sans doute le plus utilisé dans l'écosystème k8s. Ne permet pas de stocker des logs.
-- Flow (aka NetFlow aka Flow log): une clé consistant en source & dest IP+port et protocol L3/4 (5-tuples), et des meta-data (compteurs bytes/packets, TCP flags, compteurs drops, etc.)... puis enrichi avec infos K8S.
-- eBPF: techno permettant d'injecter un programme dans certaines parties du noyau Linux (hook points), ici utilisé afin de monitorer le trafic.
+- Flow (aka [NetFlow](https://fr.wikipedia.org/wiki/NetFlow) aka Flow log): une clé consistant en source & dest IP+port et protocol L3/4 (5-tuples), et des meta-data (compteurs bytes/packets, TCP flags, compteurs drops, etc.)... puis enrichi avec infos K8S.
+- [eBPF](https://ebpf.io/fr-fr/): techno permettant d'injecter un programme dans certaines parties du noyau Linux (hook points), ici utilisé afin de monitorer le trafic via le Traffic Controller (TC/TCx hooks).
 
 ## Diagramme NetObserv
 
