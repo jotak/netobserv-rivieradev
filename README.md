@@ -214,6 +214,8 @@ DDoS e.g. [hey-ho](https://github.com/jotak/hey-ho):
 ./hey-ho.sh -t http://ball.mesh-arena.svc:8080/health -z 5m -r 10 -g hacker -b
 ```
 
+KIND users need to add `-u 9000` (for instance) to hey-ho commands (runs as user 9000)
+
 (Détailler les scénarios)
 
 ## Activer des features
