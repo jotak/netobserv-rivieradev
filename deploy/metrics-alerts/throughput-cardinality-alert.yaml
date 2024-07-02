@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: netobserv-alerts
+  namespace: netobserv
+spec:
+  groups:
+  - name: NetObservAlerts
+    rules:
+    - alert: NetObservIngressThroughput
+      annotations:
+        message: |-
+          {{ $labels.job }}: incoming traffic exceeding 100 KBps for 5s on {{ $labels.DstK8S_OwnerType }} {{ $labels.DstK8S_OwnerName }} ({{ $labels.DstK8S_Namespace }}).
+        summary: "High ingress throughput."
+      expr: sum(rate(netobserv_workload_ingress_bytes_total{DstK8S_OwnerType!="Node"}[1m])) by (job, DstK8S_Namespace, DstK8S_OwnerName) > 100000
+      for: 5s
+      labels:
+        severity: warning
+    - alert: NetObservIngressCardinality
+      annotations:
+        message: |-
+          {{ $labels.job }}: incoming flows exceed 75 flows/s for 5s on {{ $labels.DstK8S_OwnerType }} {{ $labels.DstK8S_OwnerName }} ({{ $labels.DstK8S_Namespace }}).
+        summary: "High ingress flows/cardinality."
+      expr: sum(rate(netobserv_ingress_cardinality{DstK8S_OwnerType!="Node"}[1m])) by (job, DstK8S_Namespace, DstK8S_OwnerName) > 75
+      for: 5s
+      labels:
+        severity: warning

@@ -63,6 +63,24 @@ kubectl apply -n netobserv -f https://raw.githubusercontent.com/jotak/netobserv-
 kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/netobserv/flowcollector-loki-operator.yaml
 ```
 
+#### Alternative plus simple: Loki en 1 pod monolithe
+
+Si on ne veut pas perdre de temps avec l'opérateur Loki et son stockage, il y a une alternative simple qui est suffisante pour ce workshop:
+déployer un pod unique de Loki en mode "monolithe".
+
+```bash
+kubectl create namespace netobserv
+kubectl apply -f <(curl -L https://raw.githubusercontent.com/netobserv/documents/5410e65b8e05aaabd1244a9524cfedd8ac8c56b5/examples/zero-click-loki/1-storage.yaml) -n netobserv
+kubectl apply -f <(curl -L https://raw.githubusercontent.com/netobserv/documents/5410e65b8e05aaabd1244a9524cfedd8ac8c56b5/examples/zero-click-loki/2-loki.yaml) -n netobserv
+```
+(ces quelques lignes sont données aussi dans la description de l'opérateur netobserv)
+
+Ensuite, pour activer Loki dans netobserv, il suffit de switcher `spec.loki.enable` à `true`:
+
+```bash
+kubectl patch flowcollector cluster --type json --patch='[ { "op": "replace", "path": "/spec/loki/enable", "value": true } ]'
+```
+
 ### KIND (quick setup)
 
 Téléchargez KIND: https://kind.sigs.k8s.io/
@@ -154,7 +172,7 @@ Si vous avez OperatorHub, utilisez-le pour installer l'opérateur.
 Vous pouvez aussi utiliser [operator-sdk](https://sdk.operatorframework.io/docs/installation/) puis lancer:
 
 ```bash
-operator-sdk run bundle quay.io/netobserv/network-observability-operator-bundle:v1.6.0 --timeout 5m
+operator-sdk run bundle quay.io/netobserv/network-observability-operator-bundle:v1.6.1-community --timeout 5m
 ```
 
 Autrement, clonez le repo operator et utilisez la Makefile:
@@ -168,7 +186,7 @@ USER=netobserv make deploy
 make deploy-grafana deploy-loki
 
 # Configurer NetObserv (resource FlowCollector)
-kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/flowcollector-kind.yaml
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/netobserv/flowcollector-kind.yaml
 
 make deploy-prometheus
 ```
@@ -201,32 +219,114 @@ Ouvrir http://localhost:9001/
 
 ## Déployer des workloads
 
-E.g. demo-mesh-arena:
+### Mesh-arena
+
+C'est une petite démo avec des bonshommes qui courent derrière un ballon
 
 ```bash
 kubectl create namespace mesh-arena ; kubectl apply -f https://raw.githubusercontent.com/jotak/demo-mesh-arena/main/quickstart-naked.yml -n mesh-arena
 kubectl port-forward --address 0.0.0.0 svc/ui -n mesh-arena 8080:8080 2>&1 >/dev/null &
 ```
 
-DDoS e.g. [hey-ho](https://github.com/jotak/hey-ho):
+Ouvrir ensuite http://localhost:8080
+
+Dans NetObserv, vous verrez ça:
+
+![mesh-arena](./images/mesh-arena-netobserv.png)
+
+### Hey-ho
+
+`Hey` est un programme d'injection de charge réseau, développé par @rakyll: https://github.com/rakyll/hey
+
+[hey-ho](https://github.com/jotak/hey-ho) est une petite surcouche pour lancer ça via différents pods, accompagnés d'un serveur nginx, les uns sur les autres. Ou, alternativement, vers une cible spécifiée.
+
+Attention, allez-y mollo avec ce script, il peut mettre un cluster sur les rotules.
+
+Par exemple, une petite injection de charge de 200 workers au total, répartis en 2 déploiements, chacun rate-limited à 200 queries per second, pendant 30 secondes:
 
 ```bash
-./hey-ho.sh -t http://ball.mesh-arena.svc:8080/health -z 5m -r 10 -g hacker -b
+./hey-ho.sh -p -d 2
+# ou:
+./hey-ho.sh -p -d 2 -u 9000
 ```
 
-KIND users need to add `-u 9000` (for instance) to hey-ho commands (runs as user 9000)
+NOTE: vous devrez peut-être ajouter `-u 9000` (par exemple) aux commandes hey-ho si vous rencontrez des erreurs. Pour "run as user 9000".
 
-(Détailler les scénarios)
+![hey-ho](./images/hey-ho.png)
+
+
+Ou en ciblant un service de "mesh-arena" deployé précédemment (simulant une attaque DDoS):
+
+```bash
+./hey-ho.sh -t http://ball.mesh-arena.svc:8080/health -z 2m -r 10 -g hacker -b
+# ou:
+./hey-ho.sh -t http://ball.mesh-arena.svc:8080/health -z 2m -r 10 -g hacker -u 9000 -b
+```
+
+![hey-ho](./images/hey-ho-ddos.png)
+
 
 ## Activer des features
 
 Activer les packet drops, latency, DNS, AZ ...
+
+Tout est dans le CRD: https://docs.openshift.com/container-platform/4.16/observability/network_observability/flowcollector-api.html
 
 ## Usages avancés
 
 - Customiser les métriques, créer des alertes
 - Filtrage eBPF, subnet flagging
 - CLI, packet capture
+
+### Zoom sur les métriques et alertes, avec un cas pratique
+
+Mettons que l'on souhaite être alerté en cas d'une hausse de trafic anormale. On prend le cas de l'ingress ici, mais ça marche aussi en egress! (Vos workloads sont utilisés à mauvais escient).
+
+La métrique existe: `netobserv_workload_ingress_bytes_total`.
+On va créer une alerte:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/metrics-alerts/throughput-alert.yaml
+
+# on attend un peu... puis on rejoue le "DDoS" précédent
+./hey-ho.sh -t http://ball.mesh-arena.svc:8080/health -z 2m -r 10 -g hacker -b
+```
+
+=> L'alerte se déclenche
+
+Et si l'attaquant ne génère pas de grosse volumétrie? E.g. SYN flood
+
+On peut se focaliser alors sur le nombre de flows générés, plutôt que le traffic. Un flow = un 5-tuples [Src IP, Src Port, Dst IP, Dst Port, Protocol]. Donc chaque connection TCP génère un flow différent.
+
+Pour créer notre métrique qui va compter le nombre de flows plutôt que le nombre de bytes ou packets, utilisons l'[API FlowMetrics](https://docs.openshift.com/container-platform/4.16/observability/network_observability/flowmetric-api.html):
+
+```yaml
+apiVersion: flows.netobserv.io/v1alpha1
+kind: FlowMetric
+metadata:
+  name: ingress-cardinality
+  namespace: netobserv
+spec:
+  metricName: ingress_cardinality
+  type: Counter
+  direction: Ingress
+  labels: [SrcSubnetLabel,DstK8S_Namespace,DstK8S_OwnerName,DstK8S_OwnerType]
+```
+
+(D'autres examples [ici](https://github.com/netobserv/network-observability-operator/tree/main/config/samples/flowmetrics)).
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/metrics-alerts/ingress-cardinality.yaml
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/metrics-alerts/throughput-cardinality-alert.yaml
+```
+
+Simulons ensuite notre attaque avec un rate-limit de 1 query par seconde depuis 2500 sources:
+
+```bash
+./hey-ho.sh -t http://ball.mesh-arena.svc:8080/health -z 1m -r 10 -g hacker -q 1 -b
+```
+
+=> Cette fois-ci, la première alerte ne se déclenche pas (volumétrie trop faible); en revanche la 2e alerte se déclenche.
 
 ## Sujets annexes que l'on peut aborder
 

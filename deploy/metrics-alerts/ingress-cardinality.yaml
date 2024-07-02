@@ -1,0 +1,10 @@
+apiVersion: flows.netobserv.io/v1alpha1
+kind: FlowMetric
+metadata:
+  name: ingress-cardinality
+  namespace: netobserv
+spec:
+  metricName: ingress_cardinality
+  type: Counter
+  direction: Ingress
+  labels: [SrcSubnetLabel,DstK8S_Namespace,DstK8S_OwnerName,DstK8S_OwnerType]
