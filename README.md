@@ -81,32 +81,6 @@ Ensuite, pour activer Loki dans netobserv, il suffit de switcher `spec.loki.enab
 kubectl patch flowcollector cluster --type json --patch='[ { "op": "replace", "path": "/spec/loki/enable", "value": true } ]'
 ```
 
-### KIND (quick setup)
-
-Téléchargez KIND: https://kind.sigs.k8s.io/
-
-```bash
-# Cloner le repo
-git clone git@github.com:netobserv/network-observability-operator.git
-cd network-observability-operator
-
-# Démarrer KIND (pour podman, il faut lancer en root, cf plus bas)
-kind create cluster
-kubectl create namespace netobserv && kubectl config set-context --current --namespace=netobserv
-
-# Déployer netobserv operator
-USER=netobserv make deploy-kind
-
-# Déployer Grafana et Loki
-make deploy-grafana deploy-loki
-
-# Configurer NetObserv (resource FlowCollector)
-kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/netobserv/flowcollector-kind.yaml
-
-# Déployer Prometheus
-make deploy-prometheus
-```
-
 ### KIND (détaillé)
 
 Téléchargez KIND: https://kind.sigs.k8s.io/
@@ -226,6 +200,9 @@ C'est une petite démo avec des bonshommes qui courent derrière un ballon
 
 ```bash
 kubectl create namespace mesh-arena ; kubectl apply -f https://raw.githubusercontent.com/jotak/demo-mesh-arena/main/quickstart-naked.yml -n mesh-arena
+# ou, pour KIND:
+kubectl create namespace mesh-arena ; kubectl apply -f https://raw.githubusercontent.com/jotak/demo-mesh-arena/main/quickstart-9000.yml -n mesh-arena
+
 kubectl port-forward --address 0.0.0.0 svc/ui -n mesh-arena 8080:8080 2>&1 >/dev/null &
 ```
 
