@@ -92,7 +92,7 @@ cd network-observability-operator
 
 # Démarrer KIND (pour podman, il faut lancer en root, cf plus bas)
 kind create cluster
-kubectl config set-context --current --namespace=netobserv
+kubectl create namespace netobserv && kubectl config set-context --current --namespace=netobserv
 
 # Déployer netobserv operator
 USER=netobserv make deploy-kind
@@ -137,10 +137,11 @@ kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/ma
 kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-rivieradev/main/deploy/netobserv/flowcollector-kind.yaml
 ```
 
-### KIND: suite
+### KIND: vérification, ça fonctionne?
 
 Console Prometheus: http://localhost:9090/
 - On peut exécuter du promQL tel que: `sum(rate(netobserv_workload_ingress_bytes_total[1m])) by (SrcK8S_Namespace, DstK8S_Namespace)`.
+- URL directe: http://localhost:9090/graph?g0.expr=sum(rate(netobserv_workload_ingress_bytes_total%5B1m%5D))%20by%20(SrcK8S_OwnerName%2C%20SrcK8S_Namespace%2C%20DstK8S_OwnerName%2C%20DstK8S_Namespace)&g0.tab=0&g0.display_mode=lines&g0.show_exemplars=0&g0.range_input=15m
 
 Console Grafana: http://localhost:3000/
 - Log avec admin/admin

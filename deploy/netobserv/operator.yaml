@@ -8982,16 +8982,16 @@ spec:
         - /manager
         env:
         - name: RELATED_IMAGE_EBPF_AGENT
-          value: quay.io/netobserv/netobserv-ebpf-agent:main
+          value: quay.io/netobserv/netobserv-ebpf-agent:v1.6.1-community
         - name: RELATED_IMAGE_FLOWLOGS_PIPELINE
-          value: quay.io/netobserv/flowlogs-pipeline:main
+          value: quay.io/netobserv/flowlogs-pipeline:v1.6.1-community
         - name: RELATED_IMAGE_CONSOLE_PLUGIN
-          value: quay.io/netobserv/network-observability-console-plugin:main
+          value: quay.io/netobserv/network-observability-console-plugin:v1.6.1-community
         - name: DOWNSTREAM_DEPLOYMENT
           value: "false"
         - name: PROFILING_BIND_ADDRESS
           value: ""
-        image: quay.io/netobserv/network-observability-operator:main
+        image: quay.io/netobserv/network-observability-operator:1.6.1-community
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
