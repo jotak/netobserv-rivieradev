@@ -2,6 +2,8 @@
 
 Ce repo contient les instructions et resources utiles au déroulement du [Deep Dive NetObserv](https://www.rivieradev.fr/session/226).
 
+Slides : https://docs.google.com/presentation/d/1NVoBxhpfHhYUfwq_n9RDE9TajCmKBPBz4rhZ5N-mY8k/
+
 Rejoignez le chat discord: https://discord.gg/tJDGfjMf
 
 ![image](https://github.com/jotak/netobserv-rivieradev/assets/2153442/94f3bf9d-6660-4a90-ab6b-71147587394f)
