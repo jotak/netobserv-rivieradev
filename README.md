@@ -2,6 +2,8 @@
 
 Ce repo contient les instructions et resources utiles au déroulement du [Deep Dive NetObserv](https://www.rivieradev.fr/session/226).
 
+Rejoignez le chat discord: https://discord.gg/tJDGfjMf
+
 ## Terminologie
 
 - [KIND](https://kind.sigs.k8s.io/): "Kubernetes in Docker": un mini k8s utilisable sur son laptop.
