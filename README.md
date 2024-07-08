@@ -2,7 +2,7 @@
 
 Ce repo contient les instructions et resources utiles au déroulement du [Deep Dive NetObserv](https://www.rivieradev.fr/session/226).
 
-Slides : https://docs.google.com/presentation/d/1NVoBxhpfHhYUfwq_n9RDE9TajCmKBPBz4rhZ5N-mY8k/
+[Slides](https://docs.google.com/presentation/d/1UrJbrMacGL0oHVy5AVUDU0BLBKc3E4qqktinsNfYLyc/edit?usp=sharing)
 
 Rejoignez le chat discord: https://discord.gg/tJDGfjMf
 
