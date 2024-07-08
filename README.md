@@ -4,6 +4,9 @@ Ce repo contient les instructions et resources utiles au déroulement du [Deep D
 
 Rejoignez le chat discord: https://discord.gg/tJDGfjMf
 
+![image](https://github.com/jotak/netobserv-rivieradev/assets/2153442/94f3bf9d-6660-4a90-ab6b-71147587394f)
+
+
 ## Terminologie
 
 - [KIND](https://kind.sigs.k8s.io/): "Kubernetes in Docker": un mini k8s utilisable sur son laptop.
