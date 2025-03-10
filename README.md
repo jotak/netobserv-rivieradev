@@ -142,8 +142,8 @@ kubectl edit flowcollector cluster
 
 ```bash
 sudo kind create cluster
-sudo mv /root/.kube/config /home/user/.kube/config-root
-sudo chown user:user /home/user/.kube/config-root
+sudo mv /root/.kube/config /home/$USER/.kube/config-root
+sudo chown $USER:$USER /home/$USER/.kube/config-root
 export KUBECONFIG=/home/$USER/.kube/config-root
 ```
 
